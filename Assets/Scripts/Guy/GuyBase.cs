@@ -8,6 +8,8 @@ public class GuyBase : MonoBehaviour
     protected GameObject nearFood;
     protected GameObject nearSameGuy;
     protected GameObject nearDifferentGuy;
+    public int generationsSurvived = 0;
+    public int foodTaken = 0;
     protected float[] inputs;
 
     public void SetBrain(Genome genome, NeuralNetwork brain)

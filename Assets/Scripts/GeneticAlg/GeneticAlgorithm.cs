@@ -6,6 +6,9 @@ public class Genome
 {
 	public float[] genome;
 	public float fitness = 0;
+	public int generationsAlive = 0;
+	public bool ableToLive;
+	public bool ableToReproduce;
 
 	public Genome(float[] genes)
 	{
@@ -21,18 +24,23 @@ public class Genome
             genome[j] = Random.Range(-1.0f, 1.0f);
 
         fitness = 0;
+		ableToLive = false;
+		ableToReproduce = false;
 	}
 
     public Genome()
     {
         fitness = 0;
-    }
+		ableToLive = false;
+		ableToReproduce = false;
+	}
 
 }
 
 public class GeneticAlgorithm 
 {
 	List<Genome> population = new List<Genome>();
+	List<Genome> populationToReproduce = new List<Genome>();
 	List<Genome> newPopulation = new List<Genome>();
 
 	float totalFitness;
@@ -41,9 +49,8 @@ public class GeneticAlgorithm
 	float mutationChance = 0.0f;
 	float mutationRate = 0.0f;
 
-	public GeneticAlgorithm(int eliteCount, float mutationChance, float mutationRate)
+	public GeneticAlgorithm(float mutationChance, float mutationRate)
 	{
-		this.eliteCount = eliteCount;
 		this.mutationChance = mutationChance;
 		this.mutationRate = mutationRate;
 	}
@@ -66,31 +73,43 @@ public class GeneticAlgorithm
 		totalFitness = 0;
 
 		population.Clear();
+		populationToReproduce.Clear();
 		newPopulation.Clear();
 
 		population.AddRange(oldGenomes);
-		population.Sort(HandleComparison);
 
-		foreach (Genome g in population)
-		{
-			totalFitness += g.fitness;
+		SelectReproductiveElite();
+
+		while(populationToReproduce.Count >= 2)
+        {
+			Crossover();
 		}
 
 		SelectElite();
 
-		while (newPopulation.Count < population.Count)
-		{
-			Crossover();
-		}
 
 		return newPopulation.ToArray();
 	}
 
-	void SelectElite()
+	void SelectReproductiveElite()
 	{
-		for (int i = 0; i < eliteCount && newPopulation.Count < population.Count; i++)
+		foreach(Genome genome in population)
+        {
+			if(genome.ableToReproduce)
+            {
+				populationToReproduce.Add(genome);
+            }
+        }
+	}
+
+	void SelectElite()
+    {
+		foreach (Genome genome in population)
 		{
-			newPopulation.Add(population[i]);
+			if (genome.ableToLive)
+			{
+				newPopulation.Add(genome);
+			}
 		}
 	}
 
@@ -150,26 +169,12 @@ public class GeneticAlgorithm
 		return Random.Range(0.0f, 1.0f) < mutationChance;
 	}
 
-	int HandleComparison(Genome x, Genome y)
-	{
-		return x.fitness > y.fitness ? 1 : x.fitness < y.fitness ? -1 : 0;
-	}
-
-
 	public Genome RouletteSelection()
 	{
-		float rnd = Random.Range(0, Mathf.Max(totalFitness, 0));
-
-		float fitness = 0;
-
-		for (int i = 0; i < population.Count; i++)
-		{
-			fitness += Mathf.Max(population[i].fitness, 0);
-			if (fitness >= rnd)
-				return population[i];
-		}
-
-		return null;
+		int rnd = Random.Range(0, populationToReproduce.Count - 1);
+		Genome g = populationToReproduce[rnd];
+		populationToReproduce.RemoveAt(rnd);
+		return g;
 	}
 
 }

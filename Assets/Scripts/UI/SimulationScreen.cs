@@ -9,8 +9,6 @@ public class SimulationScreen : MonoBehaviour
     public Text bestFitnessTxt;
     public Text avgFitnessTxt;
     public Text worstFitnessTxt;
-    public Text timerTxt;
-    public Slider timerSlider;
     public Button pauseBtn;
     public Button stopBtn;
     public GameObject startConfigurationScreen;
@@ -21,17 +19,11 @@ public class SimulationScreen : MonoBehaviour
     string bestFitnessText;
     string avgFitnessText;
     string worstFitnessText;
-    string timerText;
     int lastGeneration = 0;
 
     // Start is called before the first frame update
     void Start()
     {
-        timerSlider.onValueChanged.AddListener(OnTimerChange);
-        timerText = timerTxt.text;
-
-        timerTxt.text = string.Format(timerText, tribe.IterationCount);
-
         if (string.IsNullOrEmpty(generationsCountText))
             generationsCountText = generationsCountTxt.text;   
         if (string.IsNullOrEmpty(bestFitnessText))
@@ -48,24 +40,18 @@ public class SimulationScreen : MonoBehaviour
     void OnEnable()
     {
         if (string.IsNullOrEmpty(generationsCountText))
-            generationsCountText = generationsCountTxt.text;   
+            generationsCountText = generationsCountTxt.text;
         if (string.IsNullOrEmpty(bestFitnessText))
-            bestFitnessText = bestFitnessTxt.text;   
+            bestFitnessText = bestFitnessTxt.text;
         if (string.IsNullOrEmpty(avgFitnessText))
-            avgFitnessText = avgFitnessTxt.text;   
+            avgFitnessText = avgFitnessTxt.text;
         if (string.IsNullOrEmpty(worstFitnessText))
-            worstFitnessText = worstFitnessTxt.text;   
+            worstFitnessText = worstFitnessTxt.text;
 
         generationsCountTxt.text = string.Format(generationsCountText, 0);
         bestFitnessTxt.text = string.Format(bestFitnessText, 0);
         avgFitnessTxt.text = string.Format(avgFitnessText, 0);
         worstFitnessTxt.text = string.Format(worstFitnessText, 0);
-    }
-
-    void OnTimerChange(float value)
-    {
-        tribe.IterationCount = (int)value;
-        timerTxt.text = string.Format(timerText, tribe.IterationCount);
     }
 
     void OnPauseButtonClick()

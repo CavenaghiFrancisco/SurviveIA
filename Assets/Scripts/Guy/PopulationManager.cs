@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using System;
 
 public enum SIDE
 {
@@ -11,14 +12,17 @@ public class PopulationManager : MonoBehaviour
 {
     public GameObject GuyPrefab;
 
+    public static Action<int, List<Vector3>> OnPopulationCreated;
+
+    public Action OnPopulationDeleted;
+
     public SIDE sideOfTribe;
 
     public int PopulationCount = 40;
 
     public int GenerationTurnDuration = 20;
-    public int IterationCount = 1;
+    public static int IterationCount = 1;
 
-    public int EliteCount = 4;
     public float MutationChance = 0.10f;
     public float MutationRate = 0.01f;
 
@@ -35,9 +39,6 @@ public class PopulationManager : MonoBehaviour
     List<Guy> populationGOs = new List<Guy>();
     List<Genome> population = new List<Genome>();
     List<NeuralNetwork> brains = new List<NeuralNetwork>();
-    List<GameObject> mines = new List<GameObject>();
-    List<GameObject> goodMines = new List<GameObject>();
-    List<GameObject> badMines = new List<GameObject>();
 
     float accumTime = 0;
     bool isRunning = false;
@@ -100,11 +101,11 @@ public class PopulationManager : MonoBehaviour
     public void StartSimulation()
     {
         // Create and confiugre the Genetic Algorithm
-        genAlg = new GeneticAlgorithm(EliteCount, MutationChance, MutationRate);
+        genAlg = new GeneticAlgorithm(MutationChance, MutationRate);
 
         GenerateInitialPopulation();
 
-        isRunning = false; //AAAAAAAAA;
+        isRunning = false; //TODO: cambiar a true;
     }
 
     public void PauseSimulation()
@@ -120,9 +121,6 @@ public class PopulationManager : MonoBehaviour
 
         // Destroy previous tanks (if there are any)
         DestroyGuys();
-
-        // Destroy all mines
-        DestroyMines();
     }
 
     // Generate the random initial population
@@ -145,6 +143,15 @@ public class PopulationManager : MonoBehaviour
             population.Add(genome);
             populationGOs.Add(CreateGuy(genome, brain, i, sideOfTribe));
         }
+
+        List<Vector3> positionsUsed = new List<Vector3>(); 
+
+        foreach(Guy guy in populationGOs)
+        {
+            positionsUsed.Add(guy.gameObject.transform.position);
+        }
+
+        OnPopulationCreated?.Invoke(PopulationCount, positionsUsed);
 
         accumTime = 0.0f;
     }
@@ -180,26 +187,66 @@ public class PopulationManager : MonoBehaviour
         avgFitness = getAvgFitness();
         worstFitness = getWorstFitness();
 
+        int l = 0;
+        foreach (Guy guy in populationGOs)
+        {
+            population[l].generationsAlive++;
+
+            if (guy.foodTaken > 1)
+            {
+                population[l].ableToLive = true;
+                if(guy.foodTaken >= 2)
+                {
+                    population[l].ableToReproduce = true;
+                }
+                else
+                {
+                    population[l].ableToReproduce = true;
+                }
+            }
+            else
+            {
+                population[l].ableToLive = true;
+                population[l].ableToReproduce = true;
+            }
+
+            if(population[l].generationsAlive >= 2)
+            {
+                population[l].ableToLive = false;
+                population[l].ableToReproduce = false;
+            }
+            l++;
+        }
+
+
+
         // Evolve each genome and create a new array of genomes
         Genome[] newGenomes = genAlg.Epoch(population.ToArray());
 
-        // Clear current population
-        population.Clear();
+        DestroyGuys();
 
         // Add new population
         population.AddRange(newGenomes);
 
-        // Set the new genomes as each NeuralNetwork weights
-        for (int i = 0; i < PopulationCount; i++)
+
+        for (int i = 0; i < population.Count; i++)
         {
-            NeuralNetwork brain = brains[i];
+            NeuralNetwork brain = CreateBrain();
 
             brain.SetWeights(newGenomes[i].genome);
+            brains.Add(brain);
 
-            populationGOs[i].SetBrain(newGenomes[i], brain);
-            //populationGOs[i].transform.position = GetRandomPos();
-            //populationGOs[i].transform.rotation = GetRandomRot();
+            populationGOs.Add(CreateGuy(newGenomes[i], brain, i, sideOfTribe));
         }
+
+        List<Vector3> positionsUsed = new List<Vector3>();
+
+        foreach (Guy guy in populationGOs)
+        {
+            positionsUsed.Add(guy.gameObject.transform.position);
+        }
+
+        OnPopulationCreated?.Invoke(PopulationCount, positionsUsed);
     }
 
     // Update is called once per frame
@@ -213,11 +260,11 @@ public class PopulationManager : MonoBehaviour
 
         foreach (Guy t in populationGOs)
         {
-            //// Get the nearest mine
-            //GameObject mine = GetNearestMine(t.transform.position);
+            //// Get the nearest food
+            GameObject food = GetNearestFood(t.transform.position);
 
             //// Set the nearest mine to current tank
-            //t.SetNearestMine(mine);
+            t.SetNearestFood(food);
 
             //mine = GetNearestGoodMine(t.transform.position);
 
@@ -237,14 +284,19 @@ public class PopulationManager : MonoBehaviour
             if (pos.x > MapCreator.Instance.sizeX)
                 pos.x = 0;
             else if (pos.x < 0)
-                pos.x = MapCreator.Instance.sizeX;
+                pos.x = MapCreator.Instance.sizeX - 1;
+
+            if (pos.z < 0)
+                pos.z = 0;
+            else if (pos.z > MapCreator.Instance.sizeY - 1)
+                pos.z = MapCreator.Instance.sizeY - 1;
 
             // Set tank position
             t.transform.position = pos;
         }
 
         // Check the time to evolve
-        accumTime += dt;
+        accumTime += dt/ IterationCount;
         if (accumTime >= GenerationTurnDuration)
         {
             accumTime -= GenerationTurnDuration;
@@ -259,26 +311,17 @@ public class PopulationManager : MonoBehaviour
         Vector3 position;
         if (side == SIDE.DOWN)
         {
-            position = new Vector3(iteration - MapCreator.Instance.sizeX * (iteration / MapCreator.Instance.sizeX), 0, iteration / MapCreator.Instance.sizeX);
+            position = new Vector3(iteration - MapCreator.Instance.sizeX * (iteration / MapCreator.Instance.sizeX), 1.5f, iteration / MapCreator.Instance.sizeX);
         }
         else
         {
-            position = new Vector3(MapCreator.Instance.sizeX - (iteration - MapCreator.Instance.sizeX * (iteration / MapCreator.Instance.sizeX)), 0.5f, MapCreator.Instance.sizeY - (iteration / MapCreator.Instance.sizeX));
+            position = new Vector3(MapCreator.Instance.sizeX - (iteration - MapCreator.Instance.sizeX * (iteration / MapCreator.Instance.sizeX)) - 1, 1.5f, MapCreator.Instance.sizeY - (iteration / MapCreator.Instance.sizeX) - 1);
         }
         GameObject go = Instantiate<GameObject>(GuyPrefab, position, Quaternion.identity);
         Guy t = go.GetComponent<Guy>();
         t.SetBrain(genome, brain);
+        t.generationsSurvived = genome.generationsAlive;
         return t;
-    }
-
-    void DestroyMines()
-    {
-        foreach (GameObject go in mines)
-            Destroy(go);
-
-        mines.Clear();
-        goodMines.Clear();
-        badMines.Clear();
     }
 
     void DestroyGuys()
@@ -289,50 +332,42 @@ public class PopulationManager : MonoBehaviour
         populationGOs.Clear();
         population.Clear();
         brains.Clear();
+
+        OnPopulationDeleted?.Invoke();
     }
 
-    
-
-    void SetMineGood(bool good, GameObject go)
+    void FiltrateGuys()
     {
-        if (good)
+        foreach (Guy go in populationGOs)
+            Destroy(go.gameObject);
+
+        populationGOs.Clear();
+        brains.Clear();
+
+        OnPopulationDeleted?.Invoke();
+    }
+
+    GameObject GetNearestFood(Vector3 pos)
+    {
+        if(MapCreator.Instance.foods.Count > 0)
         {
-            go.GetComponent<Renderer>().material.color = Color.green;
-            goodMines.Add(go);
+            GameObject nearestFood = MapCreator.Instance.foods[0];
+
+            foreach (GameObject food in MapCreator.Instance.foods)
+            {
+                if (Vector3.Distance(nearestFood.transform.position, pos) < Vector3.Distance(food.transform.position, pos))
+                {
+                    nearestFood = food;
+                }
+            }
+
+            return nearestFood;
         }
         else
         {
-            go.GetComponent<Renderer>().material.color = Color.red;
-            badMines.Add(go);
+            return null;
         }
-
     }
-
-    //Vector3 GetRandomPos()
-    //{
-    //    return new Vector3(Random.value * SceneHalfExtents.x * 2.0f - SceneHalfExtents.x, 0.0f, Random.value * SceneHalfExtents.z * 2.0f - SceneHalfExtents.z);
-    //}
-
-    GameObject GetNearestMine(Vector3 pos)
-    {
-        GameObject nearest = mines[0];
-        float distance = (pos - nearest.transform.position).sqrMagnitude;
-
-        foreach (GameObject go in mines)
-        {
-            float newDist = (go.transform.position - pos).sqrMagnitude;
-            if (newDist < distance)
-            {
-                nearest = go;
-                distance = newDist;
-            }
-        }
-
-        return nearest;
-    }
-
-    
-
     #endregion
 
 }

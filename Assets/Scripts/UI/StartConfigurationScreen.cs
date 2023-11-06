@@ -7,12 +7,8 @@ public class StartConfigurationScreen : MonoBehaviour
 {
     public Text populationCountTxt;
     public Slider populationCountSlider;
-    public Text FoodCountTxt;
-    public Slider FoodCountSlider;
     public Text GenerationTurnDurationTxt;
     public Slider GenerationTurnDurationSlider;
-    public Text eliteCountTxt;
-    public Slider eliteCountSlider;
     public Text mutationChanceTxt;
     public Slider mutationChanceSlider;
     public Text mutationRateTxt;
@@ -31,9 +27,7 @@ public class StartConfigurationScreen : MonoBehaviour
     public PopulationManager tribe;
 
     string populationText;
-    string minesText;
     string GenerationTurnDurationText;
-    string elitesText;
     string mutationChanceText;
     string mutationRateText;
     string hiddenLayersCountText;
@@ -44,9 +38,7 @@ public class StartConfigurationScreen : MonoBehaviour
     void Start()
     {   
         populationCountSlider.onValueChanged.AddListener(OnPopulationCountChange);
-        FoodCountSlider.onValueChanged.AddListener(OnFoodCountChange);
         GenerationTurnDurationSlider.onValueChanged.AddListener(OnGenerationTurnDurationChange);
-        eliteCountSlider.onValueChanged.AddListener(OnEliteCountChange);
         mutationChanceSlider.onValueChanged.AddListener(OnMutationChanceChange);
         mutationRateSlider.onValueChanged.AddListener(OnMutationRateChange);
         hiddenLayersCountSlider.onValueChanged.AddListener(OnHiddenLayersCountChange);
@@ -55,9 +47,7 @@ public class StartConfigurationScreen : MonoBehaviour
         sigmoidSlopeSlider.onValueChanged.AddListener(OnSigmoidSlopeChange);
 
         populationText = populationCountTxt.text;
-        minesText = FoodCountTxt.text;
         GenerationTurnDurationText = GenerationTurnDurationTxt.text;
-        elitesText = eliteCountTxt.text;
         mutationChanceText = mutationChanceTxt.text;
         mutationRateText = mutationRateTxt.text;
         hiddenLayersCountText = hiddenLayersCountTxt.text;
@@ -66,9 +56,7 @@ public class StartConfigurationScreen : MonoBehaviour
         sigmoidSlopeText = sigmoidSlopeTxt.text;
 
         populationCountSlider.value = tribe.PopulationCount;
-        FoodCountSlider.value = MapCreator.Instance.FoodCount;
         GenerationTurnDurationSlider.value = tribe.GenerationTurnDuration;
-        eliteCountSlider.value = tribe.EliteCount;
         mutationChanceSlider.value = tribe.MutationChance * 100.0f;
         mutationRateSlider.value = tribe.MutationRate * 100.0f;
         hiddenLayersCountSlider.value = tribe.HiddenLayers;
@@ -86,25 +74,11 @@ public class StartConfigurationScreen : MonoBehaviour
         populationCountTxt.text = string.Format(populationText, tribe.PopulationCount);
     }
 
-    void OnFoodCountChange(float value)
-    {
-        MapCreator.Instance.FoodCount = (int)value;        
-
-        FoodCountTxt.text = string.Format(minesText, MapCreator.Instance.FoodCount);
-    }
-
     void OnGenerationTurnDurationChange(float value)
     {
         tribe.GenerationTurnDuration = (int)value;
         
         GenerationTurnDurationTxt.text = string.Format(GenerationTurnDurationText, tribe.GenerationTurnDuration);
-    }
-
-    void OnEliteCountChange(float value)
-    {
-        tribe.EliteCount = (int)value;
-
-        eliteCountTxt.text = string.Format(elitesText, tribe.EliteCount);
     }
 
     void OnMutationChanceChange(float value)
