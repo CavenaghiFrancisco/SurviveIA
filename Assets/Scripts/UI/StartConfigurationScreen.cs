@@ -7,8 +7,6 @@ public class StartConfigurationScreen : MonoBehaviour
 {
     public Text populationCountTxt;
     public Slider populationCountSlider;
-    public Text GenerationTurnDurationTxt;
-    public Slider GenerationTurnDurationSlider;
     public Text mutationChanceTxt;
     public Slider mutationChanceSlider;
     public Text mutationRateTxt;
@@ -27,7 +25,6 @@ public class StartConfigurationScreen : MonoBehaviour
     public PopulationManager tribe;
 
     string populationText;
-    string GenerationTurnDurationText;
     string mutationChanceText;
     string mutationRateText;
     string hiddenLayersCountText;
@@ -38,7 +35,6 @@ public class StartConfigurationScreen : MonoBehaviour
     void Start()
     {   
         populationCountSlider.onValueChanged.AddListener(OnPopulationCountChange);
-        GenerationTurnDurationSlider.onValueChanged.AddListener(OnGenerationTurnDurationChange);
         mutationChanceSlider.onValueChanged.AddListener(OnMutationChanceChange);
         mutationRateSlider.onValueChanged.AddListener(OnMutationRateChange);
         hiddenLayersCountSlider.onValueChanged.AddListener(OnHiddenLayersCountChange);
@@ -47,7 +43,6 @@ public class StartConfigurationScreen : MonoBehaviour
         sigmoidSlopeSlider.onValueChanged.AddListener(OnSigmoidSlopeChange);
 
         populationText = populationCountTxt.text;
-        GenerationTurnDurationText = GenerationTurnDurationTxt.text;
         mutationChanceText = mutationChanceTxt.text;
         mutationRateText = mutationRateTxt.text;
         hiddenLayersCountText = hiddenLayersCountTxt.text;
@@ -56,7 +51,6 @@ public class StartConfigurationScreen : MonoBehaviour
         sigmoidSlopeText = sigmoidSlopeTxt.text;
 
         populationCountSlider.value = tribe.PopulationCount;
-        GenerationTurnDurationSlider.value = tribe.GenerationTurnDuration;
         mutationChanceSlider.value = tribe.MutationChance * 100.0f;
         mutationRateSlider.value = tribe.MutationRate * 100.0f;
         hiddenLayersCountSlider.value = tribe.HiddenLayers;
@@ -74,12 +68,7 @@ public class StartConfigurationScreen : MonoBehaviour
         populationCountTxt.text = string.Format(populationText, tribe.PopulationCount);
     }
 
-    void OnGenerationTurnDurationChange(float value)
-    {
-        tribe.GenerationTurnDuration = (int)value;
-        
-        GenerationTurnDurationTxt.text = string.Format(GenerationTurnDurationText, tribe.GenerationTurnDuration);
-    }
+    
 
     void OnMutationChanceChange(float value)
     {

@@ -20,7 +20,7 @@ public class PopulationManager : MonoBehaviour
 
     public int PopulationCount = 40;
 
-    public int GenerationTurnDuration = 20;
+    public static int GenerationTurnDuration = 20;
     public static int IterationCount = 1;
 
     public float MutationChance = 0.10f;
@@ -201,16 +201,16 @@ public class PopulationManager : MonoBehaviour
                 }
                 else
                 {
-                    population[l].ableToReproduce = true;
+                    population[l].ableToReproduce = false;
                 }
             }
             else
             {
-                population[l].ableToLive = true;
-                population[l].ableToReproduce = true;
+                population[l].ableToLive = false;
+                population[l].ableToReproduce = false;
             }
 
-            if(population[l].generationsAlive >= 2)
+            if(population[l].generationsAlive >= 3)
             {
                 population[l].ableToLive = false;
                 population[l].ableToReproduce = false;
@@ -266,6 +266,10 @@ public class PopulationManager : MonoBehaviour
             //// Set the nearest mine to current tank
             t.SetNearestFood(food);
 
+
+            GameObject guy = GetNearestGuy(t.transform.position);
+
+            t.SetNearestGuy(guy);
             //mine = GetNearestGoodMine(t.transform.position);
 
             //// Set the nearest mine to current tank
@@ -280,25 +284,17 @@ public class PopulationManager : MonoBehaviour
             t.Think(dt);
 
             // Just adjust tank position when reaching world extents
-            Vector3 pos = t.transform.position;
-            if (pos.x > MapCreator.Instance.sizeX)
-                pos.x = 0;
-            else if (pos.x < 0)
-                pos.x = MapCreator.Instance.sizeX - 1;
-
-            if (pos.z < 0)
-                pos.z = 0;
-            else if (pos.z > MapCreator.Instance.sizeY - 1)
-                pos.z = MapCreator.Instance.sizeY - 1;
-
-            // Set tank position
-            t.transform.position = pos;
+            
         }
 
         // Check the time to evolve
         accumTime += dt/ IterationCount;
         if (accumTime >= GenerationTurnDuration)
         {
+            foreach (Guy t in populationGOs)
+            {
+                t.CalculateFinalScore();
+            }
             accumTime -= GenerationTurnDuration;
             Epoch();
         }
@@ -336,17 +332,6 @@ public class PopulationManager : MonoBehaviour
         OnPopulationDeleted?.Invoke();
     }
 
-    void FiltrateGuys()
-    {
-        foreach (Guy go in populationGOs)
-            Destroy(go.gameObject);
-
-        populationGOs.Clear();
-        brains.Clear();
-
-        OnPopulationDeleted?.Invoke();
-    }
-
     GameObject GetNearestFood(Vector3 pos)
     {
         if(MapCreator.Instance.foods.Count > 0)
@@ -362,6 +347,28 @@ public class PopulationManager : MonoBehaviour
             }
 
             return nearestFood;
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    GameObject GetNearestGuy(Vector3 pos)
+    {
+        if (populationGOs.Count > 0)
+        {
+            GameObject nearestGuy = populationGOs[0].gameObject;
+
+            foreach (Guy guy in populationGOs)
+            {
+                if (Vector3.Distance(nearestGuy.transform.position, pos) < Vector3.Distance(guy.gameObject.transform.position, pos))
+                {
+                    nearestGuy = guy.gameObject;
+                }
+            }
+
+            return nearestGuy;
         }
         else
         {

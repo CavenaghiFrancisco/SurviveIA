@@ -56,13 +56,13 @@ public class MapCreator : MonoBehaviour
 
     void CreateFood(int populationCount, List<Vector3> positionsUsed)
     {
-        tiles = originalTiles;
-        for (int i = 0; i < populationCount; i++)
+        foreach(Vector3 pos in originalTiles)
         {
-            if(positionsUsed.Count > 0)
-            {
-                tiles.Remove(positionsUsed[i]);
-            }
+            tiles.Add(pos);
+        }
+        for (int i = 0; i < positionsUsed.Count; i++)
+        {
+            tiles.Remove(positionsUsed[i]);
         }
         createTimesCalled++;
         if(createTimesCalled == 2)

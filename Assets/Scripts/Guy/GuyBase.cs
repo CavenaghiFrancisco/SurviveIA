@@ -24,11 +24,7 @@ public class GuyBase : MonoBehaviour
 	{
         OnThink(dt);
 
-        //if(IsCloseToMine(nearMine))
-        //{
-        //    OnTakeMine(nearMine);
-        //    PopulationManager.Instance.RelocateMine(nearMine);
-        //}
+        
 	}
 
     protected virtual void OnThink(float dt)
@@ -36,7 +32,7 @@ public class GuyBase : MonoBehaviour
 
     }
 
-    protected virtual void OnTakeMine(GameObject mine)
+    protected virtual void OnTakeFood(GameObject food)
     {
     }
 
