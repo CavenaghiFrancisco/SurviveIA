@@ -1766,6 +1766,7 @@ MonoBehaviour:
   NeuronsCountPerHL: 29
   Bias: -8
   P: 0.1037349
+  populationGOs: []
 --- !u!4 &335213740
 Transform:
   m_ObjectHideFlags: 0
@@ -2582,6 +2583,7 @@ MonoBehaviour:
   stopBtn: {fileID: 93747996}
   startConfigurationScreen: {fileID: 886660823}
   simulationScreen: {fileID: 1686088475}
+  gameManager: {fileID: 1333924400}
   tribe: {fileID: 1690210758}
 --- !u!114 &493711103
 MonoBehaviour:
@@ -3696,6 +3698,7 @@ MonoBehaviour:
   sigmoidSlopeSlider: {fileID: 1585947224}
   startButton: {fileID: 6729309}
   simulationScreen: {fileID: 1686088475}
+  GameManager: {fileID: 1333924400}
   tribe: {fileID: 1690210758}
 --- !u!114 &886660826
 MonoBehaviour:
@@ -5998,6 +6001,52 @@ MonoBehaviour:
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
+--- !u!1 &1333924400
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1333924402}
+  - component: {fileID: 1333924401}
+  m_Layer: 0
+  m_Name: GameManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!114 &1333924401
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1333924400}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e301a5a41ce36d141bc4cf4a9c59265f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  tribe1: {fileID: 1690210758}
+  tribe2: {fileID: 335213739}
+--- !u!4 &1333924402
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1333924400}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 526.3821, y: 421.62753, z: -7.1179376}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 7
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1349107509
 GameObject:
   m_ObjectHideFlags: 0
@@ -7098,6 +7147,7 @@ MonoBehaviour:
   sigmoidSlopeSlider: {fileID: 1326007634}
   startButton: {fileID: 6729309}
   simulationScreen: {fileID: 1686088475}
+  GameManager: {fileID: 1333924400}
   tribe: {fileID: 335213739}
 --- !u!114 &1576315783
 MonoBehaviour:
@@ -7906,6 +7956,7 @@ MonoBehaviour:
   NeuronsCountPerHL: 29
   Bias: -8
   P: 0.1037349
+  populationGOs: []
 --- !u!4 &1690210759
 Transform:
   m_ObjectHideFlags: 0
@@ -8057,6 +8108,7 @@ MonoBehaviour:
   stopBtn: {fileID: 93747996}
   startConfigurationScreen: {fileID: 1576315780}
   simulationScreen: {fileID: 1686088475}
+  gameManager: {fileID: 1333924400}
   tribe: {fileID: 335213739}
 --- !u!114 &1717071133
 MonoBehaviour:
