@@ -21,7 +21,6 @@ public class PopulationManager : MonoBehaviour
     public int PopulationCount = 40;
 
     public static int GenerationTurnDuration = 20;
-    public static int IterationCount = 1;
 
     public float MutationChance = 0.10f;
     public float MutationRate = 0.01f;
@@ -36,8 +35,8 @@ public class PopulationManager : MonoBehaviour
 
     GeneticAlgorithm genAlg;
 
-    List<Guy> populationGOs = new List<Guy>();
-    List<Genome> population = new List<Genome>();
+    public List<Guy> populationGOs = new List<Guy>();
+    public List<Genome> population = new List<Genome>();
     List<NeuralNetwork> brains = new List<NeuralNetwork>();
 
     float accumTime = 0;
@@ -250,7 +249,7 @@ public class PopulationManager : MonoBehaviour
     }
 
     // Update is called once per frame
-    void FixedUpdate()
+    public void PlayTurn()
     {
         if (!isRunning)
             return;
@@ -288,7 +287,11 @@ public class PopulationManager : MonoBehaviour
         }
 
         // Check the time to evolve
-        accumTime += dt/ IterationCount;
+        accumTime += dt;
+    }
+
+    public void CheckFinalTurn()
+    {
         if (accumTime >= GenerationTurnDuration)
         {
             foreach (Guy t in populationGOs)
@@ -298,7 +301,6 @@ public class PopulationManager : MonoBehaviour
             accumTime -= GenerationTurnDuration;
             Epoch();
         }
-
     }
 
     #region Helpers

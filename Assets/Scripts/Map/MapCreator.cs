@@ -94,4 +94,28 @@ public class MapCreator : MonoBehaviour
         }
             
     }
+
+    public GameObject FoodIn(Vector3 pos)
+    {
+        foreach (GameObject go in foods)
+        {
+            if (go.transform.position.x == pos.x && go.transform.position.z == pos.z)
+            {
+                return go;
+            }
+        }
+        return null;
+    }
+
+    public bool IsFoodIn(Vector3 pos)
+    {
+        foreach(GameObject go in foods)
+        {
+            if(go.transform.position.x == pos.x && go.transform.position.z == pos.z)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
 }

@@ -13,6 +13,7 @@ public class SimulationScreen : MonoBehaviour
     public Button stopBtn;
     public GameObject startConfigurationScreen;
     public GameObject simulationScreen;
+    public GameObject gameManager;
     public PopulationManager tribe;
 
     string generationsCountText;
@@ -65,6 +66,7 @@ public class SimulationScreen : MonoBehaviour
         simulationScreen.SetActive(false);
         startConfigurationScreen.SetActive(true);
         lastGeneration = 0;
+        gameManager.SetActive(false);
     }
 
     void LateUpdate()

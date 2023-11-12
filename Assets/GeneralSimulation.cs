@@ -18,7 +18,7 @@ public class GeneralSimulation : MonoBehaviour
         GenerationTurnDurationSlider.onValueChanged.AddListener(OnGenerationTurnDurationChange);
         timerText = timerTxt.text;
 
-        timerTxt.text = string.Format(timerText, PopulationManager.IterationCount);
+        timerTxt.text = string.Format(timerText, GameManager.IterationCount);
 
         GenerationTurnDurationText = GenerationTurnDurationTxt.text;
         GenerationTurnDurationSlider.value = PopulationManager.GenerationTurnDuration;
@@ -26,8 +26,8 @@ public class GeneralSimulation : MonoBehaviour
 
     void OnTimerChange(float value)
     {
-        PopulationManager.IterationCount = (int)value;
-        timerTxt.text = string.Format(timerText, PopulationManager.IterationCount);
+        GameManager.IterationCount = (int)value;
+        timerTxt.text = string.Format(timerText, GameManager.IterationCount);
     }
 
     void OnGenerationTurnDurationChange(float value)

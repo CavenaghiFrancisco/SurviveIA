@@ -21,6 +21,7 @@ public class StartConfigurationScreen : MonoBehaviour
     public Slider sigmoidSlopeSlider;
     public Button startButton;
     public GameObject simulationScreen;
+    public GameObject GameManager;
 
     public PopulationManager tribe;
 
@@ -119,6 +120,7 @@ public class StartConfigurationScreen : MonoBehaviour
         tribe.StartSimulation();
         this.gameObject.SetActive(false);
         simulationScreen.SetActive(true);
+        GameManager.SetActive(true);
     }
     
 }

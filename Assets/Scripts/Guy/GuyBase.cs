@@ -3,7 +3,7 @@ using System.Collections;
 
 public class GuyBase : MonoBehaviour
 {
-    protected Genome genome;
+    public Genome genome;
 	protected NeuralNetwork brain;
     protected GameObject nearFood;
     protected GameObject nearSameGuy;
@@ -32,7 +32,7 @@ public class GuyBase : MonoBehaviour
 
     }
 
-    protected virtual void OnTakeFood(GameObject food)
+    public virtual void OnTakeFood(GameObject food)
     {
     }
 

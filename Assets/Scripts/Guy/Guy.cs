@@ -1,8 +1,11 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 public class Guy : GuyBase
 {
     float fitness = 0;
+    float[] output;
+    Vector3 pastPos;
     protected override void OnReset()
     {
         fitness = 1;
@@ -20,9 +23,9 @@ public class Guy : GuyBase
         //inputs[7] = -234;
 
 
-        float[] output = brain.Synapsis(inputs);
+        output = brain.Synapsis(inputs);
 
-        Vector3 pastPos = transform.position;
+        pastPos = transform.position;
 
         if(Mathf.Max(output[0], output[1], output[2], output[3], output[4]) == output[0])
         {
@@ -86,8 +89,9 @@ public class Guy : GuyBase
         nearDifferentGuy = guy;
     }
 
-    protected override void OnTakeFood(GameObject mine)
+    public override void OnTakeFood(GameObject mine)
     {
+        foodTaken++;
         fitness += 500;
         if(foodTaken >= 2)
         {
@@ -99,9 +103,12 @@ public class Guy : GuyBase
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Food"))
+        if (other.CompareTag("Guy"))
         {
-            foodTaken++;
+            ClashesManager.RegisterCollision(this, other.GetComponent<Guy>());
+        }
+        else if(other.CompareTag("Food"))
+        {
             OnTakeFood(other.gameObject);
         }
     }
@@ -115,4 +122,19 @@ public class Guy : GuyBase
         }
         genome.fitness = fitness;
     }
+
+    public CLASH_RESULT TakeClashDecision(bool isGoodCollision)
+    {
+        if(output[0] >= 0.5f)
+        {
+            transform.position = pastPos;
+            return CLASH_RESULT.STAY;
+        }
+        else
+        {
+            return CLASH_RESULT.RUN;
+        }
+    }
+
+    
 }
