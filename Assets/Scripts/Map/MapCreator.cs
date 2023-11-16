@@ -111,7 +111,7 @@ public class MapCreator : MonoBehaviour
     {
         foreach(GameObject go in foods)
         {
-            if(go.transform.position.x == pos.x && go.transform.position.z == pos.z)
+            if(go.transform.position.x == pos.x && go.transform.position.z == pos.z && go.activeSelf)
             {
                 return true;
             }

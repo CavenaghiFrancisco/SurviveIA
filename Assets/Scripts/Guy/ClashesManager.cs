@@ -9,16 +9,24 @@ public enum CLASH_RESULT
     RUN
 }
 
-public class ClashesManager : MonoBehaviour
+public class ClashesManager
 {
     static Dictionary<Tuple<Guy, Guy>, bool> collisionsToResolve = new Dictionary<Tuple<Guy, Guy>, bool>();
 
     public static void RegisterCollision(Guy guy1, Guy guy2)
     {
         Tuple<Guy, Guy> guysCollision = new Tuple<Guy, Guy>(guy1, guy2);
+        Tuple<Guy, Guy> guysCollision2 = new Tuple<Guy, Guy>(guy2, guy1);
         if (MapCreator.Instance.IsFoodIn(guy1.transform.position))
         {
-            if (!collisionsToResolve.ContainsKey(guysCollision))
+            if (!collisionsToResolve.ContainsKey(guysCollision) && !collisionsToResolve.ContainsKey(guysCollision2))
+            {
+                collisionsToResolve.Add(guysCollision, true);
+            }
+        }
+        else
+        {
+            if (!collisionsToResolve.ContainsKey(guysCollision) && !collisionsToResolve.ContainsKey(guysCollision2))
             {
                 collisionsToResolve.Add(guysCollision, false);
             }
@@ -32,11 +40,11 @@ public class ClashesManager : MonoBehaviour
         {
             if (IsGoodCollision(tribe, collision.Key))
             {
-                ResolveGoodCollision(collision.Key);
+                ResolveGoodCollision(collision.Key, collision.Value);
             }
             else
             {
-                guysToDelete.Add(ResolveBadCollision(collision.Key));
+                guysToDelete.Add(ResolveBadCollision(collision.Key, collision.Value));
             }
         }
         foreach (Guy g in guysToDelete)
@@ -59,13 +67,30 @@ public class ClashesManager : MonoBehaviour
         collisionsToResolve.Clear();
     }
 
-    private void ResolveGoodCollision(Tuple<Guy, Guy> key)
+    private void ResolveGoodCollision(Tuple<Guy, Guy> key, bool isFoodInBetween)
     {
         CLASH_RESULT resultGuy1 = key.Item1.TakeClashDecision(true);
         CLASH_RESULT resultGuy2 = key.Item2.TakeClashDecision(true);
+
+        if (resultGuy1 == CLASH_RESULT.STAY && resultGuy2 == CLASH_RESULT.STAY)
+        {
+            if (UnityEngine.Random.Range(0, 2) == 0)
+            {
+                key.Item1.OnTakeFood(MapCreator.Instance.FoodIn(key.Item2.transform.position), true);
+                key.Item2.OnTakeFood(MapCreator.Instance.FoodIn(key.Item2.transform.position), true);
+            }
+        }
+        else if (resultGuy1 == CLASH_RESULT.RUN && resultGuy2 == CLASH_RESULT.STAY)
+        {
+            key.Item2.OnTakeFood(MapCreator.Instance.FoodIn(key.Item2.transform.position), false);
+        }
+        else if (resultGuy1 == CLASH_RESULT.STAY && resultGuy2 == CLASH_RESULT.RUN)
+        {
+            key.Item1.OnTakeFood(MapCreator.Instance.FoodIn(key.Item1.transform.position), false);
+        }
     }
 
-    private Guy ResolveBadCollision(Tuple<Guy, Guy> key)
+    private Guy ResolveBadCollision(Tuple<Guy, Guy> key, bool isFoodInBetween)
     {
         CLASH_RESULT resultGuy1 = key.Item1.TakeClashDecision(false);
         CLASH_RESULT resultGuy2 = key.Item2.TakeClashDecision(false);
@@ -74,12 +99,28 @@ public class ClashesManager : MonoBehaviour
         {
             if (UnityEngine.Random.Range(0, 2) == 0)
             {
-                key.Item2.OnTakeFood(MapCreator.Instance.FoodIn(key.Item2.transform.position));
+                key.Item2.OnTakeFood(MapCreator.Instance.FoodIn(key.Item2.transform.position), false);
                 return key.Item1;
             }
             else
             {
-                key.Item1.OnTakeFood(MapCreator.Instance.FoodIn(key.Item1.transform.position));
+                key.Item1.OnTakeFood(MapCreator.Instance.FoodIn(key.Item1.transform.position), false);
+                return key.Item2;
+            }
+        }
+        else if(resultGuy1 == CLASH_RESULT.RUN && resultGuy2 == CLASH_RESULT.STAY)
+        {
+            if (!isFoodInBetween && UnityEngine.Random.Range(0, 5) > 0)
+            {
+                key.Item1.transform.position = key.Item1.pastPos;
+                return key.Item1;
+            }
+        }
+        else if(resultGuy1 == CLASH_RESULT.STAY && resultGuy2 == CLASH_RESULT.RUN)
+        {
+            if (!isFoodInBetween && UnityEngine.Random.Range(0, 5) > 0)
+            {
+                key.Item2.transform.position += key.Item2.pastPos;
                 return key.Item2;
             }
         }

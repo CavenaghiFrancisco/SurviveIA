@@ -4,8 +4,10 @@ using UnityEngine;
 public class Guy : GuyBase
 {
     float fitness = 0;
+    float timeBetweenEat = 0;
     float[] output;
-    Vector3 pastPos;
+    public Vector3 pastPos;
+
     protected override void OnReset()
     {
         fitness = 1;
@@ -15,19 +17,15 @@ public class Guy : GuyBase
     {
         inputs[0] = nearFood == null ? 0 : nearFood.transform.position.x;
         inputs[1] = nearFood == null ? 0 : nearFood.transform.position.z;
-        inputs[2] = nearSameGuy == null ? 0 : nearSameGuy.transform.position.x;
-        inputs[3] = nearSameGuy == null ? 0 : nearSameGuy.transform.position.z;
-        inputs[4] = MapCreator.Instance.foods.Count;
-        //inputs[5] = 3.5f;
-        //inputs[6] = 1;
-        //inputs[7] = -234;
+        inputs[2] = transform.position.x;
+        inputs[3] = transform.position.z;
 
 
         output = brain.Synapsis(inputs);
 
         pastPos = transform.position;
 
-        if(Mathf.Max(output[0], output[1], output[2], output[3], output[4]) == output[0])
+        if (Mathf.Max(output[0], output[1], output[2], output[3], output[4]) == output[0])
         {
             transform.position -= Vector3.right;
         }
@@ -58,20 +56,9 @@ public class Guy : GuyBase
         else if (pos.z > MapCreator.Instance.sizeY - 1)
             pos.z = MapCreator.Instance.sizeY - 1;
 
-        // Set tank position
         transform.position = pos;
 
-        if (pastPos == transform.position)
-        {
-            fitness -= 0.02f;
-        }
-
-        fitness -= inputs[4]/100000;
-        if(fitness < 0)
-        {
-            fitness = 0;
-        }
-        genome.fitness = fitness;
+        timeBetweenEat += Time.deltaTime;
     }
 
     public void SetNearestFood(GameObject food)
@@ -89,45 +76,33 @@ public class Guy : GuyBase
         nearDifferentGuy = guy;
     }
 
-    public override void OnTakeFood(GameObject mine)
+    public override void OnTakeFood(GameObject mine, bool isShared)
     {
-        foodTaken++;
-        fitness += 500;
-        if(foodTaken >= 2)
+        if (isShared)
         {
-            fitness += 1000;
+            foodTaken++;
         }
+        else
+        {
+            foodTaken += 0.5f;
+        }
+        fitness += 1f / timeBetweenEat * 500f;
+        timeBetweenEat = 0;
         genome.fitness = fitness;
         mine.SetActive(false);
     }
 
-    private void OnTriggerEnter(Collider other)
-    {
-        if (other.CompareTag("Guy"))
-        {
-            ClashesManager.RegisterCollision(this, other.GetComponent<Guy>());
-        }
-        else if(other.CompareTag("Food"))
-        {
-            OnTakeFood(other.gameObject);
-        }
-    }
-
     public void CalculateFinalScore()
     {
-        fitness -= MapCreator.Instance.foods.Count * 5;
-        if (fitness < 0)
-        {
-            fitness = 0;
-        }
+        fitness = foodTaken * 500;
         genome.fitness = fitness;
     }
 
     public CLASH_RESULT TakeClashDecision(bool isGoodCollision)
     {
-        if(output[0] >= 0.5f)
+        if (output[0] >= 0.5f)
         {
-            transform.position = pastPos;
+            transform.position = isGoodCollision ? transform.position + GetRandomDirection() : pastPos;
             return CLASH_RESULT.STAY;
         }
         else
@@ -136,5 +111,21 @@ public class Guy : GuyBase
         }
     }
 
-    
+    public Vector3 GetRandomDirection()
+    {
+        Vector3 up = Vector3.up;
+        Vector3 down = Vector3.down;
+        Vector3 right = Vector3.right;
+        Vector3 left = Vector3.left;
+
+        Vector3[] directions = { up, down, right, left };
+
+        int randomIndex = UnityEngine.Random.Range(0, directions.Length);
+
+        Vector3 randomDirection = directions[randomIndex];
+
+        return randomDirection;
+    }
+
+
 }

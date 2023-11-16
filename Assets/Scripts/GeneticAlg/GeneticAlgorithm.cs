@@ -29,6 +29,15 @@ public class Genome
         ableToReproduce = false;
     }
 
+    public Genome(float[] genes,int generations)
+    {
+        this.genome = genes;
+        generationsAlive = generations;
+        fitness = 0;
+        ableToLive = false;
+        ableToReproduce = false;
+    }
+
     public Genome()
     {
         fitness = 0;
@@ -47,7 +56,6 @@ public class GeneticAlgorithm
 
     float totalFitness;
 
-    int eliteCount = 0;
     float mutationChance = 0.0f;
     float mutationRate = 0.0f;
 

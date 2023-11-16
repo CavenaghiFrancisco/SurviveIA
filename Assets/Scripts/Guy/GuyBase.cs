@@ -9,7 +9,7 @@ public class GuyBase : MonoBehaviour
     protected GameObject nearSameGuy;
     protected GameObject nearDifferentGuy;
     public int generationsSurvived = 0;
-    public int foodTaken = 0;
+    public float foodTaken = 0;
     protected float[] inputs;
 
     public void SetBrain(Genome genome, NeuralNetwork brain)
@@ -32,7 +32,7 @@ public class GuyBase : MonoBehaviour
 
     }
 
-    public virtual void OnTakeFood(GameObject food)
+    public virtual void OnTakeFood(GameObject food, bool isShared)
     {
     }
 

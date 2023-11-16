@@ -10,6 +10,10 @@ public enum SIDE
 
 public class PopulationManager : MonoBehaviour
 {
+    public TextAsset populationData;
+
+    public TextAsset genomesData;
+
     public GameObject GuyPrefab;
 
     public static Action<int, List<Vector3>> OnPopulationCreated;
@@ -153,6 +157,7 @@ public class PopulationManager : MonoBehaviour
         OnPopulationCreated?.Invoke(PopulationCount, positionsUsed);
 
         accumTime = 0.0f;
+        Serializator.SerializePopulation(this);
     }
 
     // Creates a new NeuralNetwork
