@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class SimulationScreen : MonoBehaviour
@@ -67,6 +68,7 @@ public class SimulationScreen : MonoBehaviour
         startConfigurationScreen.SetActive(true);
         lastGeneration = 0;
         gameManager.SetActive(false);
+        SceneManager.LoadScene(0);
     }
 
     void LateUpdate()

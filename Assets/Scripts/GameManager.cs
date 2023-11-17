@@ -6,17 +6,29 @@ public class GameManager : MonoBehaviour
 {
     [SerializeField] private PopulationManager tribe1;
     [SerializeField] private PopulationManager tribe2;
+    bool alreadyActive;
     private ClashesManager clashesManager;
     private bool isRunning;
     public static int IterationCount = 1;
 
     private Coroutine coroutine;
 
-    void OnEnable()
+    void Start()
     {
+        alreadyActive = true;
         isRunning = true;
         clashesManager = new ClashesManager();
         coroutine = StartCoroutine(PlayTurns());
+    }
+
+    private void OnEnable()
+    {
+        if (alreadyActive)
+        {
+            isRunning = true;
+            clashesManager = new ClashesManager();
+            coroutine = StartCoroutine(PlayTurns());
+        }
     }
 
     void OnDisable()
@@ -26,6 +38,7 @@ public class GameManager : MonoBehaviour
 
     IEnumerator PlayTurns()
     {
+
         while (isRunning)
         {
             tribe1.PlayTurn();

@@ -9,7 +9,7 @@ public enum CLASH_RESULT
     RUN
 }
 
-public class ClashesManager
+public class ClashesManager : MonoBehaviour
 {
     static Dictionary<Tuple<Guy, Guy>, bool> collisionsToResolve = new Dictionary<Tuple<Guy, Guy>, bool>();
 
@@ -53,11 +53,13 @@ public class ClashesManager
             {
                 if (tribe.populationGOs.Contains(g))
                 {
+                    Destroy(g.gameObject);
                     tribe.populationGOs.Remove(g);
                     tribe.population.Remove(g.genome);
                 }
                 else
                 {
+                    Destroy(g.gameObject);
                     tribe2.populationGOs.Remove(g);
                     tribe2.population.Remove(g.genome);
                 }
@@ -69,43 +71,62 @@ public class ClashesManager
 
     private void ResolveGoodCollision(Tuple<Guy, Guy> key, bool isFoodInBetween)
     {
-        CLASH_RESULT resultGuy1 = key.Item1.TakeClashDecision(true);
-        CLASH_RESULT resultGuy2 = key.Item2.TakeClashDecision(true);
+        CLASH_RESULT resultGuy1 = key.Item1.TakeClashDecision();
+        CLASH_RESULT resultGuy2 = key.Item2.TakeClashDecision();
 
-        if (resultGuy1 == CLASH_RESULT.STAY && resultGuy2 == CLASH_RESULT.STAY)
+        if (isFoodInBetween)
         {
-            if (UnityEngine.Random.Range(0, 2) == 0)
+            if (resultGuy1 == CLASH_RESULT.STAY && resultGuy2 == CLASH_RESULT.STAY)
             {
-                key.Item1.OnTakeFood(MapCreator.Instance.FoodIn(key.Item2.transform.position), true);
-                key.Item2.OnTakeFood(MapCreator.Instance.FoodIn(key.Item2.transform.position), true);
+                if (UnityEngine.Random.Range(0, 2) == 0)
+                {
+                    key.Item1.OnTakeFood(MapCreator.Instance.FoodIn(key.Item2.transform.position), true);
+                    key.Item2.OnTakeFood(MapCreator.Instance.FoodIn(key.Item2.transform.position), true);
+                }
+            }
+            else if (resultGuy1 == CLASH_RESULT.RUN && resultGuy2 == CLASH_RESULT.STAY)
+            {
+                key.Item2.OnTakeFood(MapCreator.Instance.FoodIn(key.Item2.transform.position), false);
+            }
+            else if (resultGuy1 == CLASH_RESULT.STAY && resultGuy2 == CLASH_RESULT.RUN)
+            {
+                key.Item1.OnTakeFood(MapCreator.Instance.FoodIn(key.Item1.transform.position), false);
             }
         }
-        else if (resultGuy1 == CLASH_RESULT.RUN && resultGuy2 == CLASH_RESULT.STAY)
-        {
-            key.Item2.OnTakeFood(MapCreator.Instance.FoodIn(key.Item2.transform.position), false);
-        }
-        else if (resultGuy1 == CLASH_RESULT.STAY && resultGuy2 == CLASH_RESULT.RUN)
-        {
-            key.Item1.OnTakeFood(MapCreator.Instance.FoodIn(key.Item1.transform.position), false);
-        }
+
+        
     }
 
     private Guy ResolveBadCollision(Tuple<Guy, Guy> key, bool isFoodInBetween)
     {
-        CLASH_RESULT resultGuy1 = key.Item1.TakeClashDecision(false);
-        CLASH_RESULT resultGuy2 = key.Item2.TakeClashDecision(false);
+        CLASH_RESULT resultGuy1 = key.Item1.TakeClashDecision();
+        CLASH_RESULT resultGuy2 = key.Item2.TakeClashDecision();
 
         if (resultGuy1 == CLASH_RESULT.STAY && resultGuy2 == CLASH_RESULT.STAY)
         {
-            if (UnityEngine.Random.Range(0, 2) == 0)
+            if (isFoodInBetween)
             {
-                key.Item2.OnTakeFood(MapCreator.Instance.FoodIn(key.Item2.transform.position), false);
-                return key.Item1;
+                if (UnityEngine.Random.Range(0, 2) == 0)
+                {
+                    key.Item2.OnTakeFood(MapCreator.Instance.FoodIn(key.Item2.transform.position), false);
+                    return key.Item1;
+                }
+                else
+                {
+                    key.Item1.OnTakeFood(MapCreator.Instance.FoodIn(key.Item1.transform.position), false);
+                    return key.Item2;
+                }
             }
             else
             {
-                key.Item1.OnTakeFood(MapCreator.Instance.FoodIn(key.Item1.transform.position), false);
-                return key.Item2;
+                if (UnityEngine.Random.Range(0, 2) == 0)
+                {
+                    return key.Item1;
+                }
+                else
+                {
+                    return key.Item2;
+                }
             }
         }
         else if(resultGuy1 == CLASH_RESULT.RUN && resultGuy2 == CLASH_RESULT.STAY)

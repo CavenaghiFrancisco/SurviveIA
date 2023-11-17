@@ -98,11 +98,10 @@ public class Guy : GuyBase
         genome.fitness = fitness;
     }
 
-    public CLASH_RESULT TakeClashDecision(bool isGoodCollision)
+    public CLASH_RESULT TakeClashDecision()
     {
         if (output[0] >= 0.5f)
         {
-            transform.position = isGoodCollision ? transform.position + GetRandomDirection() : pastPos;
             return CLASH_RESULT.STAY;
         }
         else
@@ -113,8 +112,8 @@ public class Guy : GuyBase
 
     public Vector3 GetRandomDirection()
     {
-        Vector3 up = Vector3.up;
-        Vector3 down = Vector3.down;
+        Vector3 up = Vector3.forward;
+        Vector3 down = -Vector3.forward;
         Vector3 right = Vector3.right;
         Vector3 left = Vector3.left;
 

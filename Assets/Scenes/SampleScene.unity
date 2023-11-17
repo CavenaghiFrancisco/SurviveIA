@@ -1755,12 +1755,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ed158654bf2a8487cb9dc24d24b9a3f7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  populationData: {fileID: 0}
+  genomesData: {fileID: 0}
   GuyPrefab: {fileID: 3268769204173724573, guid: 6d95987b4f8762e428c44a4fbb17f762, type: 3}
   sideOfTribe: 1
   PopulationCount: 200
   MutationChance: 0.11
   MutationRate: 0.02
-  InputsCount: 5
+  InputsCount: 4
   HiddenLayers: 4
   OutputsCount: 5
   NeuronsCountPerHL: 29
@@ -7945,12 +7947,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ed158654bf2a8487cb9dc24d24b9a3f7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  populationData: {fileID: 0}
+  genomesData: {fileID: 0}
   GuyPrefab: {fileID: 3268769204173724573, guid: 6d95987b4f8762e428c44a4fbb17f762, type: 3}
   sideOfTribe: 0
   PopulationCount: 200
   MutationChance: 0.11
   MutationRate: 0.02
-  InputsCount: 5
+  InputsCount: 4
   HiddenLayers: 4
   OutputsCount: 5
   NeuronsCountPerHL: 29

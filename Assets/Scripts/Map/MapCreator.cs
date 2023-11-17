@@ -18,6 +18,8 @@ public class MapCreator : MonoBehaviour
     public int sizeX = 100;
     public int sizeY = 100;
 
+    private int populationOriginal = 0;
+
     private List<Vector3> originalTiles = new List<Vector3>();
     private List<Vector3> tiles = new List<Vector3>();
 
@@ -40,6 +42,13 @@ public class MapCreator : MonoBehaviour
         tribe2.OnPopulationDeleted += ClearFood;
     }
 
+    private void OnDestroy()
+    {
+        tribe1.OnPopulationDeleted -= ClearFood;
+        tribe2.OnPopulationDeleted -= ClearFood;
+        PopulationManager.OnPopulationCreated -= CreateFood;
+    }
+
     void Start()
     {
         for (int i = 0; i < sizeY; i++)
@@ -56,18 +65,22 @@ public class MapCreator : MonoBehaviour
 
     void CreateFood(int populationCount, List<Vector3> positionsUsed)
     {
-        foreach(Vector3 pos in originalTiles)
+        populationOriginal += populationCount;
+        if(createTimesCalled == 0)
         {
-            tiles.Add(pos);
+            foreach (Vector3 pos in originalTiles)
+            {
+                tiles.Add(pos);
+            }
         }
         for (int i = 0; i < positionsUsed.Count; i++)
         {
-            tiles.Remove(positionsUsed[i]);
+            tiles.Remove(positionsUsed[i] - Vector3.up/2);
         }
         createTimesCalled++;
         if(createTimesCalled == 2)
         {
-            for (int i = 0; i < populationCount; i++)
+            for (int i = 0; i < populationOriginal; i++)
             {
                 if (tiles.Count <= 0)
                 {
@@ -78,6 +91,7 @@ public class MapCreator : MonoBehaviour
                 tiles.Remove(tiles[random]);
             }
             createTimesCalled = 0;
+            populationOriginal = 0;
         }
     }
 
