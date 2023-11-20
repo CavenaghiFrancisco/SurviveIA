@@ -5,6 +5,8 @@ using UnityEngine.UI;
 
 public class StartConfigurationScreen : MonoBehaviour
 {
+    public TextAsset populationData;
+
     public Text populationCountTxt;
     public Slider populationCountSlider;
     public Text mutationChanceTxt;
@@ -34,7 +36,7 @@ public class StartConfigurationScreen : MonoBehaviour
     string neuronsPerHLCountText;
 
     void Start()
-    {   
+    {
         populationCountSlider.onValueChanged.AddListener(OnPopulationCountChange);
         mutationChanceSlider.onValueChanged.AddListener(OnMutationChanceChange);
         mutationRateSlider.onValueChanged.AddListener(OnMutationRateChange);
@@ -59,17 +61,37 @@ public class StartConfigurationScreen : MonoBehaviour
         biasSlider.value = -tribe.Bias;
         sigmoidSlopeSlider.value = tribe.P;
 
-        startButton.onClick.AddListener(OnStartButtonClick);        
+        startButton.onClick.AddListener(OnStartButtonClick);
+    }
+
+    private void Update()
+    {
+        if (populationData)
+        {
+            Serializator.PopulationSerial population = Serializator.DeserializePopulation(populationData.ToString());
+
+            OnMutationChanceChange(population.mutationChance * 100);
+            OnMutationRateChange(population.mutationRate * 100);
+
+            tribe.InputsCount = population.inputsCount;
+            OnHiddenLayersCountChange(population.hiddenLayers);
+            tribe.OutputsCount = population.outputsCount;
+            OnNeuronsPerHLChange(population.neuronsCountPerHL);
+            OnBiasChange(-population.bias);
+            OnSigmoidSlopeChange(population.p);
+
+            populationData = null;
+        }
     }
 
     void OnPopulationCountChange(float value)
     {
         tribe.PopulationCount = (int)value;
-        
+
         populationCountTxt.text = string.Format(populationText, tribe.PopulationCount);
     }
 
-    
+
 
     void OnMutationChanceChange(float value)
     {
@@ -88,7 +110,7 @@ public class StartConfigurationScreen : MonoBehaviour
     void OnHiddenLayersCountChange(float value)
     {
         tribe.HiddenLayers = (int)value;
-        
+
 
         hiddenLayersCountTxt.text = string.Format(hiddenLayersCountText, tribe.HiddenLayers);
     }
@@ -122,5 +144,5 @@ public class StartConfigurationScreen : MonoBehaviour
         simulationScreen.SetActive(true);
         GameManager.SetActive(true);
     }
-    
+
 }

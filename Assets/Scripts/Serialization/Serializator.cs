@@ -26,11 +26,11 @@ public class Serializator : MonoBehaviour
         public float p;
     }
 
-    public static string SerializeGenomes(List<Genome> genomes, string fileName = "")
+    public static string SerializeGenomes(List<Genome> genomes,bool tribe1, string fileName = "")
     {
         if (string.IsNullOrEmpty(fileName))
         {
-            fileName = "Assets/Resources/GenomesData/GenomesData_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + ".json";
+            fileName = "Assets/Resources/GenomesData/GenomesData/" + (tribe1 ? "/tribe1/" : "/tribe2/") + DateTime.Now.ToString("yyyyMMdd_HHmmss") + ".json";
         }
         else
         {
@@ -40,7 +40,7 @@ public class Serializator : MonoBehaviour
             }
 
             int counter = 1;
-            string originalFileName = "Assets/Resources/GenomesData" + fileName;
+            string originalFileName = "Assets/Resources/GenomesData" + (tribe1 ? "/tribe1/" : "/tribe2/") + fileName;
             while (System.IO.File.Exists(fileName))
             {
                 fileName = originalFileName.Insert(originalFileName.LastIndexOf(".json"), "_" + counter);
@@ -88,11 +88,11 @@ public class Serializator : MonoBehaviour
     }
 
 
-    public static string SerializePopulation(PopulationManager population, string fileName = "")
+    public static string SerializePopulation(PopulationManager population,bool tribe1, string fileName = "")
     {
         if (string.IsNullOrEmpty(fileName))
         {
-            fileName = "Assets/Resources/PopulationsData/PopulationData_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + ".json";
+            fileName = "Assets/Resources/PopulationsData/PopulationData" + (tribe1 ? "/tribe1/" : "/tribe2/") + DateTime.Now.ToString("yyyyMMdd_HHmmss") + ".json";
         }
         else
         {
@@ -102,7 +102,7 @@ public class Serializator : MonoBehaviour
             }
 
             int counter = 1;
-            string originalFileName = "Assets/Resources/PopulationsData" + fileName;
+            string originalFileName = "Assets/Resources/PopulationsData" + (tribe1 ? "/tribe1/" : "/tribe2/") + fileName;
             while (System.IO.File.Exists(fileName))
             {
                 fileName = originalFileName.Insert(originalFileName.LastIndexOf(".json"), "_" + counter);

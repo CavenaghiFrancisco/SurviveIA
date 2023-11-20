@@ -10,8 +10,6 @@ public enum SIDE
 
 public class PopulationManager : MonoBehaviour
 {
-    public TextAsset populationData;
-
     public TextAsset genomesData;
 
     public GameObject GuyPrefab;
@@ -106,7 +104,7 @@ public class PopulationManager : MonoBehaviour
         // Create and confiugre the Genetic Algorithm
         genAlg = new GeneticAlgorithm(MutationChance, MutationRate);
 
-        GenerateInitialPopulation();
+        GenerateInitialPopulation(genomesData != null);
 
         isRunning = false; //TODO: cambiar a true;
     }
@@ -127,37 +125,72 @@ public class PopulationManager : MonoBehaviour
     }
 
     // Generate the random initial population
-    void GenerateInitialPopulation()
+    void GenerateInitialPopulation(bool hasCreatedGenomes)
     {
-        generation = 0;
-
-        // Destroy previous tanks (if there are any)
-        DestroyGuys();
-
-        for (int i = 0; i < PopulationCount; i++)
+        if (hasCreatedGenomes)
         {
-            NeuralNetwork brain = CreateBrain();
+            List<Genome> genomes = Serializator.DeserializeGenomes(genomesData.ToString());
+            genomesData = null;
 
-            Genome genome = new Genome(brain.GetTotalWeightsCount());
+            generation = 0;
 
-            brain.SetWeights(genome.genome);
-            brains.Add(brain);
+            // Destroy previous tanks (if there are any)
+            DestroyGuys();
 
-            population.Add(genome);
-            populationGOs.Add(CreateGuy(genome, brain, i, sideOfTribe));
+            for (int i = 0; i < genomes.Count; i++)
+            {
+                NeuralNetwork brain = CreateBrain();
+
+                brain.SetWeights(genomes[i].genome);
+                brains.Add(brain);
+
+                population.Add(genomes[i]);
+                populationGOs.Add(CreateGuy(genomes[i], brain, i, sideOfTribe));
+            }
+
+            List<Vector3> positionsUsed = new List<Vector3>();
+
+            foreach (Guy guy in populationGOs)
+            {
+                positionsUsed.Add(guy.gameObject.transform.position);
+            }
+
+            OnPopulationCreated?.Invoke(PopulationCount, positionsUsed);
+
+            accumTime = 0.0f;
         }
-
-        List<Vector3> positionsUsed = new List<Vector3>(); 
-
-        foreach(Guy guy in populationGOs)
+        else
         {
-            positionsUsed.Add(guy.gameObject.transform.position);
+            generation = 0;
+
+            // Destroy previous tanks (if there are any)
+            DestroyGuys();
+
+            for (int i = 0; i < PopulationCount; i++)
+            {
+                NeuralNetwork brain = CreateBrain();
+
+                Genome genome = new Genome(brain.GetTotalWeightsCount());
+
+                brain.SetWeights(genome.genome);
+                brains.Add(brain);
+
+                population.Add(genome);
+                populationGOs.Add(CreateGuy(genome, brain, i, sideOfTribe));
+            }
+
+            List<Vector3> positionsUsed = new List<Vector3>();
+
+            foreach (Guy guy in populationGOs)
+            {
+                positionsUsed.Add(guy.gameObject.transform.position);
+            }
+
+            OnPopulationCreated?.Invoke(PopulationCount, positionsUsed);
+
+            accumTime = 0.0f;
         }
-
-        OnPopulationCreated?.Invoke(PopulationCount, positionsUsed);
-
-        accumTime = 0.0f;
-        Serializator.SerializePopulation(this);
+        
     }
 
     // Creates a new NeuralNetwork
@@ -181,7 +214,7 @@ public class PopulationManager : MonoBehaviour
     }
 
     // Evolve!!!
-    void Epoch()
+    public bool Epoch()
     {
         // Increment generation counter
         generation++;
@@ -196,7 +229,7 @@ public class PopulationManager : MonoBehaviour
         {
             population[l].generationsAlive++;
 
-            if (guy.foodTaken > 1)
+            if (guy.foodTaken >= 1)
             {
                 population[l].ableToLive = true;
                 if(guy.foodTaken >= 2)
@@ -250,14 +283,52 @@ public class PopulationManager : MonoBehaviour
             positionsUsed.Add(guy.gameObject.transform.position);
         }
 
+        if(populationGOs.Count <= 0)
+        {
+            return false;
+        }
+
+        OnPopulationCreated?.Invoke(PopulationCount, positionsUsed);
+
+        return true;
+    }
+
+    public void Respawn(PopulationManager tribe)
+    {
+        // Evolve each genome and create a new array of genomes
+        Genome[] newGenomes = genAlg.Epoch(tribe.population.ToArray(),true);
+
+        DestroyGuys();
+
+        // Add new population
+        population.AddRange(newGenomes);
+
+
+        for (int i = 0; i < population.Count; i++)
+        {
+            NeuralNetwork brain = CreateBrain();
+
+            brain.SetWeights(newGenomes[i].genome);
+            brains.Add(brain);
+
+            populationGOs.Add(CreateGuy(newGenomes[i], brain, i, sideOfTribe));
+        }
+
+        List<Vector3> positionsUsed = new List<Vector3>();
+
+        foreach (Guy guy in populationGOs)
+        {
+            positionsUsed.Add(guy.gameObject.transform.position);
+        }
+
         OnPopulationCreated?.Invoke(PopulationCount, positionsUsed);
     }
 
     // Update is called once per frame
     public void PlayTurn()
     {
-        if (!isRunning)
-            return;
+        //if (!isRunning)
+        //    return;
 
         float dt = 1;
 
@@ -295,7 +366,7 @@ public class PopulationManager : MonoBehaviour
         accumTime += dt;
     }
 
-    public void CheckFinalTurn()
+    public bool CheckFinalTurn()
     {
         if (accumTime >= GenerationTurnDuration)
         {
@@ -304,8 +375,9 @@ public class PopulationManager : MonoBehaviour
                 t.CalculateFinalScore();
             }
             accumTime -= GenerationTurnDuration;
-            Epoch();
+            return true;
         }
+        return false;
     }
 
     #region Helpers
@@ -320,7 +392,7 @@ public class PopulationManager : MonoBehaviour
         {
             position = new Vector3(MapCreator.Instance.sizeX - (iteration - MapCreator.Instance.sizeX * (iteration / MapCreator.Instance.sizeX)) - 1, 1.5f, MapCreator.Instance.sizeY - (iteration / MapCreator.Instance.sizeX) - 1);
         }
-        GameObject go = Instantiate<GameObject>(GuyPrefab, position, Quaternion.identity);
+        GameObject go = Instantiate<GameObject>(GuyPrefab, position, sideOfTribe == SIDE.UP ? Quaternion.Euler(0f, 180f, 0f) : Quaternion.identity);
         Guy t = go.GetComponent<Guy>();
         t.SetBrain(genome, brain);
         t.generationsSurvived = genome.generationsAlive;

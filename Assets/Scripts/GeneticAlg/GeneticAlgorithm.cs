@@ -78,7 +78,7 @@ public class GeneticAlgorithm
     }
 
 
-    public Genome[] Epoch(Genome[] oldGenomes)
+    public Genome[] Epoch(Genome[] oldGenomes, bool random = false)
     {
         totalFitness = 0;
 
@@ -88,11 +88,11 @@ public class GeneticAlgorithm
 
         population.AddRange(oldGenomes);
 
-        SelectReproductiveElite();
+        SelectReproductiveElite(random);
 
         while (newPopulation.Count < (populationToReproduce.Count % 2 == 0 ? populationToReproduce.Count : populationToReproduce.Count - 1))
         {
-            Crossover();
+            Crossover(random);
         }
 
         SelectElite();
@@ -101,18 +101,28 @@ public class GeneticAlgorithm
         return newPopulation.ToArray();
     }
 
-    void SelectReproductiveElite()
+    void SelectReproductiveElite(bool random = false)
     {
-        foreach (Genome genome in population)
+        if (random)
         {
-            if (genome.ableToReproduce)
+            foreach (Genome genome in population)
             {
                 populationToReproduce.Add(genome);
             }
-
-            totalFitness += genome.fitness;
         }
-        populationToReproduce = populationToReproduce.OrderByDescending(elemento => elemento.fitness).ToList();
+        else
+        {
+            foreach (Genome genome in population)
+            {
+                if (genome.ableToReproduce)
+                {
+                    populationToReproduce.Add(genome);
+                }
+
+                totalFitness += genome.fitness;
+            }
+            populationToReproduce = populationToReproduce.OrderByDescending(elemento => elemento.fitness).ToList();
+        }
     }
 
     void SelectElite()
@@ -126,20 +136,29 @@ public class GeneticAlgorithm
         }
     }
 
-    void Crossover()
+    void Crossover(bool random)
     {
         Genome mom;
         Genome dad;
-        do
+        if (random)
         {
-            mom = RouletteSelection();
-            dad = RouletteSelection();
-            if(mom == null || dad == null)
-            {
-                return;
-            }
+            mom = populationToReproduce[Random.Range(0, populationToReproduce.Count)];
+            dad = populationToReproduce[Random.Range(0, populationToReproduce.Count)];
         }
-        while (mom == dad);
+        else
+        {
+            do
+            {
+                mom = RouletteSelection();
+                dad = RouletteSelection();
+                if (mom == null || dad == null)
+                {
+                    return;
+                }
+            }
+            while (mom == dad);
+        }
+        
 
         Genome child1;
         Genome child2;

@@ -27,19 +27,19 @@ public class Guy : GuyBase
 
         if (Mathf.Max(output[0], output[1], output[2], output[3], output[4]) == output[0])
         {
-            transform.position -= Vector3.right;
+            transform.position -= transform.right;
         }
         else if (Mathf.Max(output[0], output[1], output[2], output[3], output[4]) == output[1])
         {
-            transform.position += Vector3.right;
+            transform.position += transform.right;
         }
         else if (Mathf.Max(output[0], output[1], output[2], output[3], output[4]) == output[2])
         {
-            transform.position += Vector3.forward;
+            transform.position += transform.forward;
         }
         else if (Mathf.Max(output[0], output[1], output[2], output[3], output[4]) == output[3])
         {
-            transform.position -= Vector3.forward;
+            transform.position -= transform.forward;
         }
         else
         {
@@ -57,8 +57,6 @@ public class Guy : GuyBase
             pos.z = MapCreator.Instance.sizeY - 1;
 
         transform.position = pos;
-
-        timeBetweenEat += Time.deltaTime;
     }
 
     public void SetNearestFood(GameObject food)
@@ -86,9 +84,6 @@ public class Guy : GuyBase
         {
             foodTaken += 0.5f;
         }
-        fitness += 1f / timeBetweenEat * 500f;
-        timeBetweenEat = 0;
-        genome.fitness = fitness;
         mine.SetActive(false);
     }
 

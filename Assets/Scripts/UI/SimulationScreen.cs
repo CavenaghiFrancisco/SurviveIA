@@ -68,6 +68,8 @@ public class SimulationScreen : MonoBehaviour
         startConfigurationScreen.SetActive(true);
         lastGeneration = 0;
         gameManager.SetActive(false);
+        Serializator.SerializeGenomes(tribe.population,tribe.sideOfTribe == SIDE.UP,"save");
+        Serializator.SerializePopulation(tribe, tribe.sideOfTribe == SIDE.UP, "save");
         SceneManager.LoadScene(0);
     }
 

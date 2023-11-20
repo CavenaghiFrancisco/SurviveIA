@@ -41,12 +41,14 @@ public class Neuron
 
 	public int SetWeights(float[] newWeights, int fromId)
 	{
-		for (int i = 0; i < weights.Length; i++)
+		int copyLength = Mathf.Min(weights.Length, newWeights.Length - fromId);
+
+		for (int i = 0; i < copyLength; i++)
 		{
 			this.weights[i] = newWeights[i + fromId];
 		}
 
-		return fromId + weights.Length;
+		return fromId + copyLength;
 	}
 
 	public float[] GetWeights()

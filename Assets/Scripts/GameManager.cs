@@ -43,11 +43,22 @@ public class GameManager : MonoBehaviour
         {
             tribe1.PlayTurn();
             tribe2.PlayTurn();
-            CheckGuysCollisions();
-            clashesManager.ResolveCollisions(tribe1,tribe2);
+            //CheckGuysCollisions();
+            //clashesManager.ResolveCollisions(tribe1,tribe2);
             CheckFoodToEat();
-            tribe1.CheckFinalTurn();
+            bool hasToEnd = tribe1.CheckFinalTurn();
             tribe2.CheckFinalTurn();
+            if (hasToEnd)
+            {
+                if (!tribe1.Epoch())
+                {
+                    tribe1.Respawn(tribe2);
+                }
+                if (!tribe2.Epoch())
+                {
+                    tribe2.Respawn(tribe1);
+                }
+            }
             yield return new WaitForSeconds(1f/ IterationCount);
         }
     }
