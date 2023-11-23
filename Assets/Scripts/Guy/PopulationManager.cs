@@ -229,29 +229,48 @@ public class PopulationManager : MonoBehaviour
         {
             population[l].generationsAlive++;
 
-            if (guy.foodTaken >= 1)
+            if(GameManager.Instance.CurrentState != STATES.SEARCH)
             {
-                population[l].ableToLive = true;
-                if(guy.foodTaken >= 2)
+                if (guy.foodTaken >= 1)
                 {
-                    population[l].ableToReproduce = true;
+                    population[l].ableToLive = true;
+                    if (guy.foodTaken >= 2)
+                    {
+                        population[l].ableToReproduce = true;
+                    }
+                    else
+                    {
+                        population[l].ableToReproduce = false;
+                    }
                 }
                 else
                 {
+                    population[l].ableToLive = false;
+                    population[l].ableToReproduce = false;
+                }
+
+                if (population[l].generationsAlive >= 3)
+                {
+                    population[l].ableToLive = false;
                     population[l].ableToReproduce = false;
                 }
             }
-            else
-            {
-                population[l].ableToLive = false;
-                population[l].ableToReproduce = false;
-            }
+            
 
-            if(population[l].generationsAlive >= 3)
+            if(GameManager.Instance.CurrentState == STATES.SEARCH)
             {
-                population[l].ableToLive = false;
-                population[l].ableToReproduce = false;
+                if (population[l].generationsAlive >= 2)
+                {
+                    population[l].ableToLive = false;
+                    population[l].ableToReproduce = false;
+                }
+                else
+                {
+                    population[l].ableToLive = true;
+                    population[l].ableToReproduce = true;
+                }
             }
+            
             l++;
         }
 
@@ -325,7 +344,7 @@ public class PopulationManager : MonoBehaviour
     }
 
     // Update is called once per frame
-    public void PlayTurn()
+    public void PlayTurn(PopulationManager enemyTribe)
     {
         //if (!isRunning)
         //    return;
@@ -335,31 +354,21 @@ public class PopulationManager : MonoBehaviour
 
         foreach (Guy t in populationGOs)
         {
-            //// Get the nearest food
             GameObject food = GetNearestFood(t.transform.position);
 
-            //// Set the nearest mine to current tank
             t.SetNearestFood(food);
 
-
-            GameObject guy = GetNearestGuy(t.transform.position);
+            GameObject guy = GetNearestGuy(populationGOs,t.transform.position);
 
             t.SetNearestGuy(guy);
-            //mine = GetNearestGoodMine(t.transform.position);
 
-            //// Set the nearest mine to current tank
-            //t.SetGoodNearestMine(mine);
+            GameObject enemyGuy = GetNearestGuy(enemyTribe.populationGOs, t.transform.position);
 
-            //mine = GetNearestBadMine(t.transform.position);
-
-            //// Set the nearest mine to current tank
-            //t.SetBadNearestMine(mine);
+            t.SetNearestDifferentGuy(enemyGuy);
 
             // Think!! 
             t.Think(dt);
 
-            // Just adjust tank position when reaching world extents
-            
         }
 
         // Check the time to evolve
@@ -433,13 +442,13 @@ public class PopulationManager : MonoBehaviour
         }
     }
 
-    GameObject GetNearestGuy(Vector3 pos)
+    GameObject GetNearestGuy(List<Guy> guys, Vector3 pos)
     {
-        if (populationGOs.Count > 0)
+        if (guys.Count > 0)
         {
-            GameObject nearestGuy = populationGOs[0].gameObject;
+            GameObject nearestGuy = guys[0].gameObject;
 
-            foreach (Guy guy in populationGOs)
+            foreach (Guy guy in guys)
             {
                 if (Vector3.Distance(nearestGuy.transform.position, pos) < Vector3.Distance(guy.gameObject.transform.position, pos))
                 {

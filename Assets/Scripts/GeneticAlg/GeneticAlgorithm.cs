@@ -11,6 +11,7 @@ public class Genome
     public bool ableToLive;
     public bool ableToReproduce;
 
+
     public Genome(float[] genes)
     {
         this.genome = genes;
@@ -52,7 +53,8 @@ public class GeneticAlgorithm
     List<Genome> population = new List<Genome>();
     List<Genome> populationToReproduce = new List<Genome>();
     List<Genome> newPopulation = new List<Genome>();
-    List<List<Genome>> sublists;
+
+    private const float RANDOM_MUTATION_CHANCE = 0.25f;
 
     float totalFitness;
 
@@ -163,13 +165,13 @@ public class GeneticAlgorithm
         Genome child1;
         Genome child2;
 
-        Crossover(mom, dad, out child1, out child2);
+        Crossover(mom, dad, out child1, out child2, random);
 
         newPopulation.Add(child1);
         newPopulation.Add(child2);
     }
 
-    void Crossover(Genome mom, Genome dad, out Genome child1, out Genome child2)
+    void Crossover(Genome mom, Genome dad, out Genome child1, out Genome child2, bool random = false)
     {
         child1 = new Genome();
         child2 = new Genome();
@@ -183,12 +185,12 @@ public class GeneticAlgorithm
         {
             child1.genome[i] = mom.genome[i];
 
-            if (ShouldMutate())
+            if (ShouldMutate(random))
                 child1.genome[i] += Random.Range(-mutationRate, mutationRate);
 
             child2.genome[i] = dad.genome[i];
 
-            if (ShouldMutate())
+            if (ShouldMutate(random))
                 child2.genome[i] += Random.Range(-mutationRate, mutationRate);
         }
 
@@ -196,19 +198,19 @@ public class GeneticAlgorithm
         {
             child2.genome[i] = mom.genome[i];
 
-            if (ShouldMutate())
+            if (ShouldMutate(random))
                 child2.genome[i] += Random.Range(-mutationRate, mutationRate);
 
             child1.genome[i] = dad.genome[i];
 
-            if (ShouldMutate())
+            if (ShouldMutate(random))
                 child1.genome[i] += Random.Range(-mutationRate, mutationRate);
         }
     }
 
-    bool ShouldMutate()
+    bool ShouldMutate(bool random = false)
     {
-        return Random.Range(0.0f, 1.0f) < mutationChance;
+        return Random.Range(0.0f, 1.0f) < (random ? mutationChance + RANDOM_MUTATION_CHANCE : mutationChance);
     }
 
 

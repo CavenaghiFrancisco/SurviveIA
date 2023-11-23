@@ -83,14 +83,29 @@ public class ClashesManager : MonoBehaviour
                     key.Item1.OnTakeFood(MapCreator.Instance.FoodIn(key.Item2.transform.position), true);
                     key.Item2.OnTakeFood(MapCreator.Instance.FoodIn(key.Item2.transform.position), true);
                 }
+                if(key.Item1.foodTaken == 0 && key.Item2.foodTaken == 0)
+                {
+                    key.Item1.genome.fitness += 500;
+                    key.Item2.genome.fitness += 500;
+                }
             }
             else if (resultGuy1 == CLASH_RESULT.RUN && resultGuy2 == CLASH_RESULT.STAY)
             {
                 key.Item2.OnTakeFood(MapCreator.Instance.FoodIn(key.Item2.transform.position), false);
+                if (key.Item1.foodTaken >= 2 && key.Item2.foodTaken <= 1)
+                {
+                    key.Item1.genome.fitness += 500;
+                    key.Item2.genome.fitness += 500;
+                }
             }
             else if (resultGuy1 == CLASH_RESULT.STAY && resultGuy2 == CLASH_RESULT.RUN)
             {
                 key.Item1.OnTakeFood(MapCreator.Instance.FoodIn(key.Item1.transform.position), false);
+                if (key.Item2.foodTaken >= 2 && key.Item1.foodTaken <= 1)
+                {
+                    key.Item1.genome.fitness += 500;
+                    key.Item2.genome.fitness += 500;
+                }
             }
         }
 
@@ -109,11 +124,19 @@ public class ClashesManager : MonoBehaviour
                 if (UnityEngine.Random.Range(0, 2) == 0)
                 {
                     key.Item2.OnTakeFood(MapCreator.Instance.FoodIn(key.Item2.transform.position), false);
+                    if(key.Item2.genome.generationsAlive <= 2 && key.Item2.foodTaken == 1 || key.Item1.genome.generationsAlive <= 2)
+                    {
+                        key.Item2.genome.fitness += 500;
+                    }
                     return key.Item1;
                 }
                 else
                 {
                     key.Item1.OnTakeFood(MapCreator.Instance.FoodIn(key.Item1.transform.position), false);
+                    if (key.Item1.genome.generationsAlive <= 2 && key.Item1.foodTaken == 1 || key.Item2.genome.generationsAlive <= 2)
+                    {
+                        key.Item1.genome.fitness += 500;
+                    }
                     return key.Item2;
                 }
             }
@@ -121,27 +144,45 @@ public class ClashesManager : MonoBehaviour
             {
                 if (UnityEngine.Random.Range(0, 2) == 0)
                 {
+                    if(key.Item2.genome.generationsAlive < key.Item1.genome.generationsAlive && key.Item2.genome.fitness < key.Item1.genome.fitness)
+                    {
+                        key.Item2.genome.fitness += 500;
+                    }
                     return key.Item1;
                 }
                 else
                 {
+                    if (key.Item1.genome.generationsAlive < key.Item2.genome.generationsAlive && key.Item1.genome.fitness < key.Item2.genome.fitness)
+                    {
+                        key.Item1.genome.fitness += 500;
+                    }
                     return key.Item2;
                 }
             }
         }
         else if(resultGuy1 == CLASH_RESULT.RUN && resultGuy2 == CLASH_RESULT.STAY)
         {
+            key.Item1.transform.position = key.Item1.pastPos;
+            if (key.Item1.genome.generationsAlive < key.Item2.genome.generationsAlive && key.Item1.genome.fitness > key.Item2.genome.fitness && key.Item1.foodTaken >= 2)
+            {
+                key.Item1.genome.fitness += 500;
+                key.Item2.genome.fitness += 500;
+            }
             if (!isFoodInBetween && UnityEngine.Random.Range(0, 5) > 0)
             {
-                key.Item1.transform.position = key.Item1.pastPos;
                 return key.Item1;
             }
         }
         else if(resultGuy1 == CLASH_RESULT.STAY && resultGuy2 == CLASH_RESULT.RUN)
         {
+            key.Item2.transform.position = key.Item2.pastPos;
+            if (key.Item2.genome.generationsAlive < key.Item1.genome.generationsAlive && key.Item2.genome.fitness > key.Item1.genome.fitness && key.Item2.foodTaken >= 2)
+            {
+                key.Item1.genome.fitness += 500;
+                key.Item2.genome.fitness += 500;
+            }
             if (!isFoodInBetween && UnityEngine.Random.Range(0, 5) > 0)
             {
-                key.Item2.transform.position += key.Item2.pastPos;
                 return key.Item2;
             }
         }

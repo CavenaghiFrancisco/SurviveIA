@@ -2,16 +2,40 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum STATES
+{
+    SEARCH,
+    SURVIVE,
+    FIGHT
+}
+
 public class GameManager : MonoBehaviour
 {
+    static GameManager instance = null;
+
     [SerializeField] private PopulationManager tribe1;
     [SerializeField] private PopulationManager tribe2;
+    [SerializeField] private STATES currentState = STATES.SEARCH;
     bool alreadyActive;
     private ClashesManager clashesManager;
     private bool isRunning;
     public static int IterationCount = 1;
 
+
+    public static GameManager Instance
+    {
+        get
+        {
+            if (instance == null)
+                instance = FindObjectOfType<GameManager>();
+
+            return instance;
+        }
+    }
+
     private Coroutine coroutine;
+
+    public STATES CurrentState { get => currentState; }
 
     void Start()
     {
@@ -41,10 +65,13 @@ public class GameManager : MonoBehaviour
 
         while (isRunning)
         {
-            tribe1.PlayTurn();
-            tribe2.PlayTurn();
-            //CheckGuysCollisions();
-            //clashesManager.ResolveCollisions(tribe1,tribe2);
+            tribe1.PlayTurn(tribe2);
+            tribe2.PlayTurn(tribe1);
+            if(currentState == STATES.FIGHT)
+            {
+                CheckGuysCollisions();
+                clashesManager.ResolveCollisions(tribe1, tribe2);
+            }
             CheckFoodToEat();
             bool hasToEnd = tribe1.CheckFinalTurn();
             tribe2.CheckFinalTurn();

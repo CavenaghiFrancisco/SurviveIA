@@ -63,13 +63,13 @@ public class SimulationScreen : MonoBehaviour
 
     void OnStopButtonClick()
     {
+        Serializator.SerializePopulation(tribe, tribe.sideOfTribe == SIDE.UP, "save");
+        Serializator.SerializeGenomes(tribe.population,tribe.sideOfTribe == SIDE.UP,"save");
         tribe.StopSimulation();
         simulationScreen.SetActive(false);
         startConfigurationScreen.SetActive(true);
         lastGeneration = 0;
         gameManager.SetActive(false);
-        Serializator.SerializeGenomes(tribe.population,tribe.sideOfTribe == SIDE.UP,"save");
-        Serializator.SerializePopulation(tribe, tribe.sideOfTribe == SIDE.UP, "save");
         SceneManager.LoadScene(0);
     }
 

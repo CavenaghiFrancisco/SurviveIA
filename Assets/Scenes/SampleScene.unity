@@ -1755,14 +1755,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ed158654bf2a8487cb9dc24d24b9a3f7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  populationData: {fileID: 0}
-  genomesData: {fileID: 0}
+  genomesData: {fileID: 4900000, guid: 217df63081c0cf442963f256c4b0b18c, type: 3}
   GuyPrefab: {fileID: 3268769204173724573, guid: 6d95987b4f8762e428c44a4fbb17f762, type: 3}
   sideOfTribe: 1
   PopulationCount: 200
   MutationChance: 0.11
   MutationRate: 0.02
-  InputsCount: 4
+  InputsCount: 14
   HiddenLayers: 4
   OutputsCount: 5
   NeuronsCountPerHL: 29
@@ -3684,6 +3683,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 522154f782d8e9f42a02ce353c63bde5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  populationData: {fileID: 0}
   populationCountTxt: {fileID: 2013683210}
   populationCountSlider: {fileID: 921514421}
   mutationChanceTxt: {fileID: 753078260}
@@ -6034,6 +6034,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   tribe1: {fileID: 1690210758}
   tribe2: {fileID: 335213739}
+  currentState: 0
 --- !u!4 &1333924402
 Transform:
   m_ObjectHideFlags: 0
@@ -7133,6 +7134,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 522154f782d8e9f42a02ce353c63bde5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  populationData: {fileID: 0}
   populationCountTxt: {fileID: 669890613}
   populationCountSlider: {fileID: 36399619}
   mutationChanceTxt: {fileID: 1452704384}
@@ -7947,14 +7949,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ed158654bf2a8487cb9dc24d24b9a3f7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  populationData: {fileID: 0}
-  genomesData: {fileID: 0}
+  genomesData: {fileID: 4900000, guid: 217df63081c0cf442963f256c4b0b18c, type: 3}
   GuyPrefab: {fileID: 3268769204173724573, guid: 6d95987b4f8762e428c44a4fbb17f762, type: 3}
   sideOfTribe: 0
   PopulationCount: 200
   MutationChance: 0.11
   MutationRate: 0.02
-  InputsCount: 4
+  InputsCount: 14
   HiddenLayers: 4
   OutputsCount: 5
   NeuronsCountPerHL: 29

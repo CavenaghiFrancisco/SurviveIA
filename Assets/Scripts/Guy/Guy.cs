@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class Guy : GuyBase
@@ -7,18 +8,40 @@ public class Guy : GuyBase
     float timeBetweenEat = 0;
     float[] output;
     public Vector3 pastPos;
+    public List<Vector3> posChecked = new List<Vector3>();
+    public int lastChoice = -1;
+    public int currentChoice = -1;
 
     protected override void OnReset()
     {
         fitness = 1;
+        posChecked = new List<Vector3>();
     }
 
     protected override void OnThink(float dt)
     {
-        inputs[0] = nearFood == null ? 0 : nearFood.transform.position.x;
-        inputs[1] = nearFood == null ? 0 : nearFood.transform.position.z;
-        inputs[2] = transform.position.x;
-        inputs[3] = transform.position.z;
+        if(GameManager.Instance.CurrentState != STATES.FIGHT)
+        {
+            inputs[0] = nearFood == null ? 0 : nearFood.transform.position.x;
+            inputs[1] = nearFood == null ? 0 : nearFood.transform.position.z;
+            inputs[2] = transform.position.x;
+            inputs[3] = transform.position.z;
+        }
+        
+        if(GameManager.Instance.CurrentState == STATES.FIGHT)
+        {
+            inputs[4] = nearDifferentGuy == null ? 0 : nearDifferentGuy.transform.position.x;
+            inputs[5] = nearDifferentGuy == null ? 0 : nearDifferentGuy.transform.position.z;
+            inputs[6] = nearSameGuy == null ? 0 : nearSameGuy.transform.position.x;
+            inputs[7] = nearSameGuy == null ? 0 : nearSameGuy.transform.position.z;
+            inputs[8] = nearSameGuy.GetComponent<Guy>().genome.generationsAlive;
+            inputs[9] = nearSameGuy.GetComponent<Guy>().genome.generationsAlive;
+            inputs[10] = nearDifferentGuy.GetComponent<Guy>().genome.generationsAlive;
+            inputs[11] = nearSameGuy.GetComponent<Guy>().foodTaken;
+            inputs[12] = nearDifferentGuy.GetComponent<Guy>().foodTaken;
+            inputs[13] = foodTaken;
+        }
+        
 
 
         output = brain.Synapsis(inputs);
@@ -28,21 +51,26 @@ public class Guy : GuyBase
         if (Mathf.Max(output[0], output[1], output[2], output[3], output[4]) == output[0])
         {
             transform.position -= transform.right;
+            currentChoice = 0;
         }
         else if (Mathf.Max(output[0], output[1], output[2], output[3], output[4]) == output[1])
         {
             transform.position += transform.right;
+            currentChoice = 1;
         }
         else if (Mathf.Max(output[0], output[1], output[2], output[3], output[4]) == output[2])
         {
             transform.position += transform.forward;
+            currentChoice = 2;
         }
         else if (Mathf.Max(output[0], output[1], output[2], output[3], output[4]) == output[3])
         {
             transform.position -= transform.forward;
+            currentChoice = 3;
         }
         else
         {
+            currentChoice = 4;
         }
 
         Vector3 pos = transform.position;
@@ -56,7 +84,30 @@ public class Guy : GuyBase
         else if (pos.z > MapCreator.Instance.sizeY - 1)
             pos.z = MapCreator.Instance.sizeY - 1;
 
+        if (lastChoice != -1 && currentChoice != lastChoice)
+        {
+            int count = 0;
+            for(int i = 0; i < Mathf.Min(5,posChecked.Count); i++)
+            {
+                count++;
+                if(posChecked[i] == pos)
+                    break;
+            }
+            if (!posChecked.Contains(pos) && pos.z > MapCreator.Instance.sizeY + 5 && pos.z < MapCreator.Instance.sizeY - 5)
+            {
+                genome.fitness += 120;
+            }
+            else
+            {
+                if (count == Mathf.Min(5, posChecked.Count))
+                    genome.fitness += 30;
+            }
+        }
+
+        
+        lastChoice = currentChoice;
         transform.position = pos;
+        posChecked.Add(pos);
     }
 
     public void SetNearestFood(GameObject food)
@@ -89,8 +140,15 @@ public class Guy : GuyBase
 
     public void CalculateFinalScore()
     {
-        fitness = foodTaken * 500;
-        genome.fitness = fitness;
+        if(GameManager.Instance.CurrentState != STATES.SEARCH)
+        {
+            fitness = foodTaken * 1000;
+            genome.fitness += fitness;
+        }
+        if (genome.fitness <= 0)
+        {
+            genome.fitness = 1;
+        }
     }
 
     public CLASH_RESULT TakeClashDecision()
