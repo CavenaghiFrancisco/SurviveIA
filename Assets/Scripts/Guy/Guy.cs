@@ -36,9 +36,9 @@ public class Guy : GuyBase
             inputs[7] = nearSameGuy == null ? 0 : nearSameGuy.transform.position.z;
             inputs[8] = nearSameGuy.GetComponent<Guy>().genome.generationsAlive;
             inputs[9] = nearSameGuy.GetComponent<Guy>().genome.generationsAlive;
-            inputs[10] = nearDifferentGuy.GetComponent<Guy>().genome.generationsAlive;
-            inputs[11] = nearSameGuy.GetComponent<Guy>().foodTaken;
-            inputs[12] = nearDifferentGuy.GetComponent<Guy>().foodTaken;
+            inputs[10] = nearDifferentGuy == null ? 0 : nearDifferentGuy.GetComponent<Guy>().genome.generationsAlive;
+            inputs[11] = nearSameGuy == null ? 0 : nearSameGuy.GetComponent<Guy>().foodTaken;
+            inputs[12] = nearDifferentGuy == null ? 0 : nearDifferentGuy.GetComponent<Guy>().foodTaken;
             inputs[13] = foodTaken;
         }
         
