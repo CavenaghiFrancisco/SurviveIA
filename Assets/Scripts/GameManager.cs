@@ -11,7 +11,6 @@ public enum STATES
 
 public class GameManager : MonoBehaviour
 {
-    static GameManager instance = null;
 
     [SerializeField] private PopulationManager tribe1;
     [SerializeField] private PopulationManager tribe2;
@@ -21,6 +20,7 @@ public class GameManager : MonoBehaviour
     private bool isRunning;
     public static int IterationCount = 1;
 
+    static GameManager instance = null;
 
     public static GameManager Instance
     {

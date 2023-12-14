@@ -26,10 +26,24 @@ public class Guy : GuyBase
             inputs[1] = nearFood == null ? 0 : nearFood.transform.position.z;
             inputs[2] = transform.position.x;
             inputs[3] = transform.position.z;
+            inputs[4] = nearFood == null ? 0 : nearFood.transform.position.x;
+            inputs[5] = nearFood == null ? 0 : nearFood.transform.position.z;
+            inputs[6] = nearFood == null ? 0 : nearFood.transform.position.x;
+            inputs[7] = nearFood == null ? 0 : nearFood.transform.position.z;
+            inputs[8] = nearFood == null ? 0 : nearFood.transform.position.x;
+            inputs[9] = nearFood == null ? 0 : nearFood.transform.position.z;
+            inputs[10] = nearFood == null ? 0 : nearFood.transform.position.x;
+            inputs[11] = nearFood == null ? 0 : nearFood.transform.position.z;
+            inputs[12] = nearFood == null ? 0 : nearFood.transform.position.x;
+            inputs[13] = nearFood == null ? 0 : nearFood.transform.position.z;
         }
         
         if(GameManager.Instance.CurrentState == STATES.FIGHT)
         {
+            inputs[0] = nearFood == null ? 0 : nearFood.transform.position.x;
+            inputs[1] = nearFood == null ? 0 : nearFood.transform.position.z;
+            inputs[2] = transform.position.x;
+            inputs[3] = transform.position.z;
             inputs[4] = nearDifferentGuy == null ? 0 : nearDifferentGuy.transform.position.x;
             inputs[5] = nearDifferentGuy == null ? 0 : nearDifferentGuy.transform.position.z;
             inputs[6] = nearSameGuy == null ? 0 : nearSameGuy.transform.position.x;
@@ -104,7 +118,6 @@ public class Guy : GuyBase
             }
         }
 
-        
         lastChoice = currentChoice;
         transform.position = pos;
         posChecked.Add(pos);

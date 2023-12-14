@@ -403,6 +403,8 @@ public class PopulationManager : MonoBehaviour
         }
         GameObject go = Instantiate<GameObject>(GuyPrefab, position, sideOfTribe == SIDE.UP ? Quaternion.Euler(0f, 180f, 0f) : Quaternion.identity);
         Guy t = go.GetComponent<Guy>();
+        Renderer rend = go.GetComponent<Renderer>();
+        rend.material.color = sideOfTribe == SIDE.UP ? Color.red : Color.blue;
         t.SetBrain(genome, brain);
         t.generationsSurvived = genome.generationsAlive;
         return t;

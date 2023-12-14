@@ -1755,7 +1755,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ed158654bf2a8487cb9dc24d24b9a3f7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  genomesData: {fileID: 4900000, guid: fe72346fec46d2b4a8373e8e9233a3a4, type: 3}
+  genomesData: {fileID: 4900000, guid: c60a64d676aa4444587c79187ed75858, type: 3}
   GuyPrefab: {fileID: 3268769204173724573, guid: 6d95987b4f8762e428c44a4fbb17f762, type: 3}
   sideOfTribe: 1
   PopulationCount: 200
@@ -7949,7 +7949,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ed158654bf2a8487cb9dc24d24b9a3f7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  genomesData: {fileID: 4900000, guid: fe72346fec46d2b4a8373e8e9233a3a4, type: 3}
+  genomesData: {fileID: 4900000, guid: c60a64d676aa4444587c79187ed75858, type: 3}
   GuyPrefab: {fileID: 3268769204173724573, guid: 6d95987b4f8762e428c44a4fbb17f762, type: 3}
   sideOfTribe: 0
   PopulationCount: 200
