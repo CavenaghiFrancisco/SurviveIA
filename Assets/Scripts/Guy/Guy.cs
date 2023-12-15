@@ -5,7 +5,6 @@ using UnityEngine;
 public class Guy : GuyBase
 {
     float fitness = 0;
-    float timeBetweenEat = 0;
     float[] output;
     public Vector3 pastPos;
     public List<Vector3> posChecked = new List<Vector3>();
@@ -140,7 +139,7 @@ public class Guy : GuyBase
 
     public override void OnTakeFood(GameObject mine, bool isShared)
     {
-        if (isShared)
+        if (!isShared)
         {
             foodTaken++;
         }
